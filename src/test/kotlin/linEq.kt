@@ -1,46 +1,54 @@
-fun solveLinSet(a1: Double, b1: Double, c1: Double, a2: Double, b2: Double, c2: Double): String{
-    val D = a1*b2-a2*b1     //Determinants
-    val Dx = c1*b2-c2*b1
-    val Dy = a1*c2-a2*c1
+class IndeterminateException(override val message: String = ""): Exception(message)
+class UnsolvableException(override val message: String = ""): Exception(message)
 
-    val x = Dx/D    //Cramer's Rule
-    val y = Dy/D
+class LinEq(val a: Double, val b: Double, val c: Double)
 
-    if(D == 0.0){
-        if(D == 0.0 && Dx == 0.0 && Dy == 0.0){
-            return("Indeterminate system, infinite number of solutions.")
-        }
-        else{
-            return("Unsolvable.")
-        }
+class LinearEquationSolver{
+    fun solveX(eq1: LinEq, eq2: LinEq): Double{
+            if(eq1.a*eq2.b-eq1.b*eq2.a == 0.0 && eq1.c*eq2.b-eq1.b*eq2.c == 0.0 && eq1.a*eq2.c-eq1.c*eq2.a == 0.0) throw IndeterminateException("Indeterminate system, infinite number of solutions.")
+            if(eq1.a*eq2.b-eq1.b*eq2.a == 0.0 && (eq1.c*eq2.b-eq1.b*eq2.c != 0.0 || eq1.a*eq2.c-eq1.c*eq2.a != 0.0)) throw UnsolvableException("Unsolvable system, there is no solution")
+            return (eq1.c*eq2.b-eq1.b*eq2.c)/(eq1.a*eq2.b-eq1.b*eq2.a)
     }
-    else {
-        return ("Solution:\nx = ${x}\ny = ${y}")
+    fun solveY(eq1: LinEq, eq2: LinEq): Double{
+            if(eq1.a*eq2.b-eq1.b*eq2.a == 0.0 && eq1.c*eq2.b-eq1.b*eq2.c == 0.0 && eq1.a*eq2.c-eq1.c*eq2.a == 0.0) throw IndeterminateException("Indeterminate system, infinite number of solutions.")
+            if(eq1.a*eq2.b-eq1.b*eq2.a == 0.0 && (eq1.c*eq2.b-eq1.b*eq2.c != 0.0 || eq1.a*eq2.c-eq1.c*eq2.a != 0.0)) throw UnsolvableException("Unsolvable system, there is no solution")
+            return (eq1.a*eq2.c-eq1.c*eq2.a)/(eq1.a*eq2.b-eq1.b*eq2.a)
     }
 }
 
 fun main(args: Array<String>) {
 
-    //Solving simple linear equation system with 2 unknown variables
+    val equationRegex = """\d{1,10}x\+\d{1,10}y=\d{1,10}""".toRegex()
+    val a = """\d{1,10}x""".toRegex()
+    val b = """\d{1,10}y""".toRegex()
+    val c = """=\d{1,10}""".toRegex()
 
-    println("Please specify equation according to this format:\nax + bx = c\nEquation 1")
+    println("Please enter first equation:")
+    var input = readLine().toString()
+    while(!equationRegex.matches(input = input)){
+        println("This is not a valid equation. Please use this pattern: #x+#y=#")
+        input = readLine().toString()
+    }
+    println("Equation accepted.\nPlease enter second equation:")
+    val eq1 = LinEq(a.find(input = input)?.value?.trim('x')?.toDouble()!!, b.find(input = input)?.value?.trim('y')?.toDouble()!!, c.find(input = input)?.value?.trim('=')?.toDouble()!!)
 
-    print("a: ")
-    val a1 = readLine()!!.toDouble()
-    print("b: ")
-    val b1 = readLine()!!.toDouble()
-    print("c: ")
-    val c1 = readLine()!!.toDouble()
+    input = readLine().toString()
+    while(!equationRegex.matches(input = input)){
+        println("This is not a valid equation. Please use this pattern: #x+#y=#")
+        input = readLine().toString()
+    }
+    println("Equation accepted.")
+    val eq2 = LinEq(a.find(input = input)?.value?.trim('x')?.toDouble()!!, b.find(input = input)?.value?.trim('y')?.toDouble()!!, c.find(input = input)?.value?.trim('=')?.toDouble()!!)
 
-    println("Equation 2")
+    val linEqSol = LinearEquationSolver()
 
-    print("a: ")
-    val a2 = readLine()!!.toDouble()
-    print("b: ")
-    val b2 = readLine()!!.toDouble()
-    print("c: ")
-    val c2 = readLine()!!.toDouble()
-
-    println("Attempting to solve following system:\n${a1}x + ${b1}y = $c1\n${a2}x + ${b2}y = $c2")
-    println(solveLinSet(a1, b1, c1, a2, b2, c2))
+    try {
+        println("Solution:\nx = ${linEqSol.solveX(eq1, eq2)}\ny = ${linEqSol.solveY(eq1, eq2)}")
+    }
+    catch (e: IndeterminateException){
+        println(e.message)
+    }
+    catch (e: UnsolvableException){
+        println(e.message)
+    }
 }
