@@ -2,10 +2,10 @@ package tk.evkom.mathevalbot
 
 fun main(args: Array<String>) {
 
-    val equationRegex = """\d{1,10}x\+\d{1,10}y=\d{1,10}""".toRegex()
-    val a = """[0-9]+x""".toRegex()
-    val b = """[0-9]+y""".toRegex()
-    val c = """=[0-9]+""".toRegex()
+    val equationRegex = """[0-9]+x\+[0-9]+y=[0-9]+""".toRegex()
+    val a = """[0-9]+(?=x)""".toRegex()
+    val b = """[0-9]+(?=y)""".toRegex()
+    val c = """(?<==)[0-9]+""".toRegex()
 
     println("Please enter first equation:")
     var input = readLine().toString()
@@ -14,7 +14,7 @@ fun main(args: Array<String>) {
         input = readLine().toString()
     }
     println("Equation accepted.\nPlease enter second equation:")
-    val eq1 = LinEq(a.find(input = input)?.value?.trim('x')?.toDouble()!!, b.find(input = input)?.value?.trim('y')?.toDouble()!!, c.find(input = input)?.value?.trim('=')?.toDouble()!!)
+    val eq1 = LinEq(a.find(input = input)?.value?.toDouble()!!, b.find(input = input)?.value?.toDouble()!!, c.find(input = input)?.value?.toDouble()!!)
 
     input = readLine().toString()
     while(!equationRegex.matches(input = input)){
@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
         input = readLine().toString()
     }
     println("Equation accepted.")
-    val eq2 = LinEq(a.find(input = input)?.value?.trim('x')?.toDouble()!!, b.find(input = input)?.value?.trim('y')?.toDouble()!!, c.find(input = input)?.value?.trim('=')?.toDouble()!!)
+    val eq2 = LinEq(a.find(input = input)?.value?.toDouble()!!, b.find(input = input)?.value?.toDouble()!!, c.find(input = input)?.value?.toDouble()!!)
 
     val linEqSol = LinearEquationSolver()
 
